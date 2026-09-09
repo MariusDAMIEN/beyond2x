@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Beyond2x",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Extended playback speed controls for YouTube.",
   "permissions": ["storage"],
   "host_permissions": ["https://www.youtube.com/*"],
