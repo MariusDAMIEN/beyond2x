@@ -2,7 +2,7 @@ import { DEFAULT_SPEED } from "../shared/constants";
 import { decreaseSpeed, increaseSpeed, normalizeSpeed } from "../shared/speed";
 import { getSavedSpeed, saveSpeed } from "../shared/storage";
 import { observeYouTubeNavigation } from "./navigation";
-import { NativeSpeedMenu } from "./native-speed-menu";
+import { NativeIntegrationState, NativeSpeedMenu } from "./native-speed-menu";
 import { findActiveVideo, findPlayer, findPlayerControls, isShortsPage } from "./player-finder";
 import { PlayerUI } from "./player-ui";
 
@@ -82,11 +82,20 @@ export class YouTubeController {
     const player = findPlayer(video);
     if (!player) return;
     const controls = findPlayerControls(player);
-    const nativeReady = this.nativeMenu.sync(player, normalizeSpeed(video.playbackRate));
-    if (nativeReady) {
-      this.removeUi();
-      return;
+    this.ensureFallback(player, controls, video);
+    let nativeState: NativeIntegrationState = "unavailable";
+    try {
+      nativeState = this.nativeMenu.sync(player, normalizeSpeed(video.playbackRate));
+    } catch {
+      // The fallback is already visible; a transient player DOM change must not remove it.
+      nativeState = "unavailable";
     }
+    if (nativeState === "active") {
+      this.removeUi();
+    }
+  }
+
+  private ensureFallback(player: HTMLElement, controls: HTMLElement | null, video: HTMLVideoElement): void {
     const parent = controls ?? player;
     const floating = !controls || isShortsPage();
     if (this.ui && this.ui.root.parentElement === parent && this.ui.root.classList.contains("beyond2x-control--floating") === floating) {

@@ -13,11 +13,14 @@
 .beyond2x-custom input[aria-invalid="true"] { border-color: #ff9696; }
 .beyond2x-custom button { padding: 0 11px; background: rgba(123,174,255,.2); font-weight: 650; cursor: pointer; transition: background var(--b2x-motion); }
 .beyond2x-custom button:hover { background: rgba(123,174,255,.34); }
-.beyond2x-native-divider { height: 1px; margin: 5px 12px; background: currentColor; opacity: .18; }
 .beyond2x-native-speed { position: relative; display: flex; align-items: center; min-height: 40px; box-sizing: border-box; cursor: pointer; font: inherit; transition: background var(--b2x-motion), color var(--b2x-motion); }
 .beyond2x-native-speed:hover { background: rgba(127,161,210,.17); }
 .beyond2x-native-speed__label { width: 100%; font-variant-numeric: tabular-nums; }
 .beyond2x-native-speed--selected { color: var(--b2x-accent); font-weight: 650; }
 .beyond2x-native-speed--selected::after { content: "✓"; position: absolute; right: 14px; color: var(--b2x-accent); font-weight: 700; }
+.beyond2x-native-chip { min-height: 30px; justify-content: center; border: 1px solid rgba(255,255,255,.16); border-radius: var(--b2x-radius-sm); padding: 5px 9px; background: rgba(255,255,255,.055); color: inherit; font: 600 12px/1 var(--b2x-font); font-variant-numeric: tabular-nums; }
+.beyond2x-native-chip:hover { border-color: rgba(156,197,255,.42); background: rgba(125,171,255,.2); }
+.beyond2x-native-chip.beyond2x-native-speed--selected { border-color: rgba(169,205,255,.55); background: rgba(115,164,248,.28); }
+.beyond2x-native-chip.beyond2x-native-speed--selected::after { display: none; }
 @keyframes beyond2x-menu-in { from { opacity: 0; transform: translateY(4px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (max-width: 480px) { .beyond2x-menu { width: 218px; } .beyond2x-button { min-width: 40px; padding-inline: 6px; } }
