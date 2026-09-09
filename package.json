@@ -1,6 +1,6 @@
 {
   "name": "beyond2x",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Extended playback speed controls for YouTube.",
   "type": "module",
