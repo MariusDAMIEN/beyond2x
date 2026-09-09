@@ -28,4 +28,17 @@ describe("PlayerUI", () => {
     expect(callback).toHaveBeenCalledWith(2.5);
     expect(parent.querySelector<HTMLElement>(".beyond2x-menu")?.hidden).toBe(true);
   });
+
+  it("exposes an expanded velocity gauge with keyboard precision controls", () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const callback = vi.fn();
+    const ui = new PlayerUI(parent, false, callback);
+    ui.update(3);
+    parent.querySelector<HTMLButtonElement>(".beyond2x-button")?.click();
+    const gauge = parent.querySelector<HTMLElement>(".beyond2x-gauge")!;
+    expect(gauge.getAttribute("aria-valuetext")).toBe("Playback speed 3.00×");
+    gauge.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    expect(callback).toHaveBeenCalledWith(3.25);
+  });
 });

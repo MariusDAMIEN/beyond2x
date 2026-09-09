@@ -9,7 +9,7 @@ Beyond2x is an independent open-source browser extension. It is not affiliated w
 ## Highlights
 
 - Native-adjacent integration for **Settings → Playback speed** with 2.5× through 10× presets
-- Premium compact fallback panel with preset grid and custom rate input
+- Instrument-cluster fallback panel with an interactive velocity gauge, acceleration nodes, and precision rate input
 - Real-time synchronization with the active video's actual `playbackRate`
 - Support for regular videos, playlists, Shorts, theater mode, fullscreen, and SPA navigation
 - Local speed persistence through Chrome Storage
@@ -24,6 +24,8 @@ The following paths are reserved for verified live-player captures:
 - `docs/screenshots/fallback-menu.png`
 - `docs/screenshots/shorts-control.png`
 - `docs/screenshots/fullscreen-control.png`
+
+The fallback panel uses a Beyond2x instrument-cluster interface: a logarithmic acceleration gauge, animated needle, velocity rail, and precision controls. It is intentionally extension-owned so native YouTube speed entries can remain visually restrained.
 
 ## How it feels native
 
