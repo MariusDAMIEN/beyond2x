@@ -22,7 +22,6 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run package
-      - uses: softprops/action-gh-release@v2
-        with:
-          generate_release_notes: true
-          files: release/beyond2x-v*.zip
+      - run: gh release create "${GITHUB_REF_NAME}" --generate-notes "release/beyond2x-v${GITHUB_REF_NAME#v}.zip"
+        env:
+          GH_TOKEN: ${{ github.token }}
