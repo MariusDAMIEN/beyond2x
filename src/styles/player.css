@@ -1,0 +1,11 @@
+@import "./tokens.css";
+@import "./menu.css";
+
+.beyond2x-control { position: relative; display: flex; align-items: center; z-index: 3; font-family: var(--b2x-font); }
+.beyond2x-button { min-width: 44px; height: 36px; border: 1px solid transparent; padding: 0 var(--b2x-space-2); border-radius: var(--b2x-radius-sm); color: #fff; background: linear-gradient(135deg, rgba(31, 38, 52, .88), rgba(10, 12, 18, .78)); box-shadow: inset 0 1px rgba(255,255,255,.09), 0 2px 8px rgba(0,0,0,.22); font: 650 13px/1 var(--b2x-font); font-variant-numeric: tabular-nums; letter-spacing: -.01em; text-shadow: 0 1px 2px #000; cursor: pointer; transition: background var(--b2x-motion), border-color var(--b2x-motion), transform var(--b2x-motion), box-shadow var(--b2x-motion); }
+.beyond2x-button:hover { border-color: rgba(150,190,255,.35); background: linear-gradient(135deg, rgba(52, 67, 92, .94), rgba(18, 23, 34, .92)); box-shadow: inset 0 1px rgba(255,255,255,.12), 0 4px 14px rgba(0,0,0,.3); }
+.beyond2x-button:active { transform: translateY(1px) scale(.98); }
+.beyond2x-button:focus-visible, .beyond2x-menu-item:focus-visible, .beyond2x-custom input:focus-visible, .beyond2x-custom button:focus-visible, .beyond2x-native-speed:focus-visible { outline: 2px solid var(--b2x-focus); outline-offset: 2px; }
+.beyond2x-control--floating { position: absolute; top: 14px; right: 14px; z-index: 60; padding: 3px; border: 1px solid rgba(255,255,255,.14); border-radius: var(--b2x-radius-md); background: rgba(10,12,18,.62); box-shadow: var(--b2x-shadow-float); backdrop-filter: blur(14px); }
+.beyond2x-control--floating .beyond2x-button { height: 34px; }
+.beyond2x-control--floating .beyond2x-menu { bottom: auto; top: 45px; }

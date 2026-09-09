@@ -1,0 +1,23 @@
+.beyond2x-menu { position: absolute; right: 0; bottom: 44px; width: 246px; max-height: min(430px, 70vh); overflow-y: auto; box-sizing: border-box; padding: var(--b2x-space-2); border: 1px solid rgba(255,255,255,.13); border-radius: var(--b2x-radius-lg); background: var(--b2x-surface); box-shadow: var(--b2x-shadow-float); color: var(--b2x-text); backdrop-filter: blur(18px); animation: beyond2x-menu-in var(--b2x-motion) both; }
+.beyond2x-menu::before { content: "Beyond2x"; display: block; padding: 4px 5px 2px; color: var(--b2x-text); font: 650 12px/1.2 var(--b2x-font); letter-spacing: .02em; }
+.beyond2x-menu::after { content: "Choose a preset or set a precise rate"; display: block; margin: 2px 5px 9px; color: var(--b2x-muted); font: 500 11px/1.3 var(--b2x-font); }
+.beyond2x-menu-item { display: inline-flex; width: calc(33.333% - 4px); align-items: center; justify-content: center; min-height: 32px; margin: 2px; border: 1px solid transparent; border-radius: var(--b2x-radius-sm); padding: 5px; background: rgba(255,255,255,.045); color: inherit; font: 600 12px/1 var(--b2x-font); font-variant-numeric: tabular-nums; cursor: pointer; transition: background var(--b2x-motion), border-color var(--b2x-motion), transform var(--b2x-motion); }
+.beyond2x-menu-item:hover { border-color: rgba(157,197,255,.3); background: rgba(132,178,255,.16); }
+.beyond2x-menu-item:active { transform: scale(.96); }
+.beyond2x-menu-item.is-selected { border-color: rgba(166,205,255,.52); background: linear-gradient(135deg, rgba(117,171,255,.42), rgba(72,116,199,.32)); color: #fff; box-shadow: inset 0 1px rgba(255,255,255,.12); }
+.beyond2x-menu-item.is-selected::after { content: ""; width: 4px; height: 4px; margin-left: 5px; border-radius: 50%; background: #d9eaff; box-shadow: 0 0 8px #d9eaff; }
+.beyond2x-custom { display: grid; grid-template-columns: 1fr auto; gap: var(--b2x-space-1); margin: 9px 2px 2px; padding: 9px 3px 2px; border-top: 1px solid rgba(255,255,255,.1); }
+.beyond2x-custom label { grid-column: 1 / -1; color: var(--b2x-muted); font: 600 11px/1 var(--b2x-font); }
+.beyond2x-custom input, .beyond2x-custom button { min-width: 0; border: 1px solid rgba(255,255,255,.15); border-radius: var(--b2x-radius-sm); background: rgba(255,255,255,.06); color: var(--b2x-text); font: 500 12px var(--b2x-font); }
+.beyond2x-custom input { width: 100%; box-sizing: border-box; padding: 7px 8px; }
+.beyond2x-custom input[aria-invalid="true"] { border-color: #ff9696; }
+.beyond2x-custom button { padding: 0 11px; background: rgba(123,174,255,.2); font-weight: 650; cursor: pointer; transition: background var(--b2x-motion); }
+.beyond2x-custom button:hover { background: rgba(123,174,255,.34); }
+.beyond2x-native-divider { height: 1px; margin: 5px 12px; background: currentColor; opacity: .18; }
+.beyond2x-native-speed { position: relative; display: flex; align-items: center; min-height: 40px; box-sizing: border-box; cursor: pointer; font: inherit; transition: background var(--b2x-motion), color var(--b2x-motion); }
+.beyond2x-native-speed:hover { background: rgba(127,161,210,.17); }
+.beyond2x-native-speed__label { width: 100%; font-variant-numeric: tabular-nums; }
+.beyond2x-native-speed--selected { color: var(--b2x-accent); font-weight: 650; }
+.beyond2x-native-speed--selected::after { content: "✓"; position: absolute; right: 14px; color: var(--b2x-accent); font-weight: 700; }
+@keyframes beyond2x-menu-in { from { opacity: 0; transform: translateY(4px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 480px) { .beyond2x-menu { width: 218px; } .beyond2x-button { min-width: 40px; padding-inline: 6px; } }
