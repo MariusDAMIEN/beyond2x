@@ -1,24 +1,25 @@
 .beyond2x-gauge { position: relative; width: 210px; height: 184px; margin: -5px auto -12px; touch-action: none; user-select: none; outline: none; }
-.beyond2x-gauge::before { content: ""; position: absolute; inset: 21px; border-radius: 50%; background: radial-gradient(circle at 50% 56%, rgba(47,82,108,.19), transparent 61%); filter: blur(8px); opacity: calc(.35 + var(--b2x-energy, .2) * .65); pointer-events: none; }
+.beyond2x-gauge::before { content: ""; position: absolute; inset: 21px; border-radius: 50%; background: radial-gradient(circle at 50% 56%, rgba(47,82,108,.15), transparent 61%); pointer-events: none; }
 .beyond2x-gauge-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .beyond2x-gauge-track, .beyond2x-gauge-arc { fill: none; stroke-width: 5; stroke-linecap: round; transform: rotate(-230deg); transform-origin: 90px 90px; stroke-dasharray: 342.08 439.82; }
 .beyond2x-gauge-track { stroke: rgba(150,185,217,.15); }
-.beyond2x-gauge-arc { stroke: var(--b2x-accent); stroke-dashoffset: var(--b2x-arc-offset, 300); filter: drop-shadow(0 0 calc(4px + var(--b2x-energy, .2) * 9px) var(--b2x-glow)); transition: stroke-dashoffset var(--b2x-motion-slow), filter var(--b2x-motion-normal); }
+.beyond2x-gauge-arc { stroke: var(--b2x-accent); stroke-dashoffset: var(--b2x-arc-offset, 300); filter: drop-shadow(0 0 4px var(--b2x-glow)); transition: stroke-dashoffset 140ms var(--b2x-ease-standard); }
 .beyond2x-gauge-ticks { opacity: .8; }
 .beyond2x-gauge-tick { stroke: rgba(193,220,238,.28); stroke-width: 1; }
 .beyond2x-gauge-tick--major { stroke: rgba(215,238,252,.64); stroke-width: 1.5; }
-.beyond2x-gauge-needle { transform: rotate(var(--b2x-gauge-angle, -40deg)); transform-origin: 90px 90px; transition: transform var(--b2x-motion-slow); filter: drop-shadow(0 0 6px var(--b2x-glow)); }
+.beyond2x-gauge-needle { transform: rotate(var(--b2x-gauge-angle, -40deg)); transform-origin: 90px 90px; transition: transform 150ms var(--b2x-ease-standard); filter: drop-shadow(0 0 4px var(--b2x-glow)); }
 .beyond2x-gauge[data-dragging="true"] .beyond2x-gauge-needle, .beyond2x-gauge[data-dragging="true"] .beyond2x-gauge-arc { transition: none; }
 .beyond2x-gauge-needle-line { stroke: #d9f7ff; stroke-width: 2.2; stroke-linecap: round; }
 .beyond2x-gauge-hub { fill: #dffbff; stroke: var(--b2x-accent); stroke-width: 3; }
 .beyond2x-gauge-center { position: absolute; inset: 60px 0 auto; display: grid; place-items: center; pointer-events: none; }
-.beyond2x-gauge-readout { color: #f4fbff; font: 700 29px/.95 var(--b2x-display); font-variant-numeric: tabular-nums; letter-spacing: -.08em; text-shadow: 0 0 18px rgba(126,230,255,.32); transition: color var(--b2x-motion-normal), text-shadow var(--b2x-motion-normal); }
+.beyond2x-gauge-readout { color: #f4fbff; font: 700 29px/.95 var(--b2x-display); font-variant-numeric: tabular-nums; letter-spacing: -.08em; text-shadow: 0 0 10px rgba(126,230,255,.2); }
 .beyond2x-gauge-caption { margin-top: 6px; color: var(--b2x-text-muted); font: 700 8px/1 var(--b2x-font); letter-spacing: .18em; }
 .beyond2x-gauge-labels { position: absolute; inset: 18px 12px auto; display: flex; justify-content: space-between; color: rgba(213,235,249,.64); font: 650 8px/1 var(--b2x-display); pointer-events: none; }
 .beyond2x-gauge-labels span:nth-child(2) { transform: translateY(57px); }.beyond2x-gauge-labels span:nth-child(3) { transform: translateY(57px); }
 .beyond2x-gauge:focus-visible { box-shadow: 0 0 0 2px var(--b2x-focus); border-radius: 50%; }
-.beyond2x-velocity-rail { position: relative; height: 29px; margin: 0 17px 12px; }
+.beyond2x-velocity-rail { position: relative; height: 29px; margin: 0 17px 12px; cursor: pointer; outline: none; touch-action: none; }
 .beyond2x-velocity-track { position: absolute; top: 5px; right: 0; left: 0; height: 2px; background: linear-gradient(90deg, rgba(98,140,170,.25), rgba(88,216,255,.8), rgba(98,140,170,.25)); box-shadow: 0 0 8px rgba(88,216,255,.23); }
 .beyond2x-velocity-track::before { content: ""; position: absolute; inset: -4px 0; background: repeating-linear-gradient(90deg, transparent 0 23%, rgba(202,238,255,.42) 23.5% 24%, transparent 24.5% 100%); }
-.beyond2x-velocity-marker { position: absolute; top: 1px; left: var(--b2x-rail-position, 50%); width: 10px; height: 10px; border: 2px solid #e4fbff; border-radius: 50%; background: var(--b2x-accent); box-shadow: 0 0 0 4px rgba(88,216,255,.13), 0 0 14px var(--b2x-glow); transform: translateX(-50%); transition: left var(--b2x-motion-slow), box-shadow var(--b2x-motion-normal); }
+.beyond2x-velocity-marker { position: absolute; top: 0; left: var(--b2x-rail-position, 50%); width: 11px; height: 11px; border: 2px solid #e4fbff; border-radius: 50%; background: var(--b2x-accent); box-shadow: 0 0 0 4px rgba(88,216,255,.1), 0 0 8px var(--b2x-glow); transform: translateX(-50%); transition: left 140ms var(--b2x-ease-standard); }
+.beyond2x-velocity-rail[data-dragging="true"] .beyond2x-velocity-marker { transition: none; }.beyond2x-velocity-rail:focus-visible { box-shadow: 0 0 0 2px var(--b2x-focus); border-radius: 5px; }
 .beyond2x-velocity-labels { position: absolute; top: 16px; right: -2px; left: -2px; display: flex; justify-content: space-between; color: var(--b2x-text-muted); font: 600 8px/1 var(--b2x-display); }

@@ -1,6 +1,6 @@
 import { SPEED_PRESETS } from "../shared/constants";
 import { decreaseSpeed, formatSpeed, increaseSpeed, parseCustomSpeed } from "../shared/speed";
-import { formatGaugeSpeed, gaugeAngleToSpeed, snapGaugeSpeed, speedToGaugeAngle, speedToGaugeRatio } from "./gauge";
+import { formatGaugeSpeed, gaugeAngleToSpeed, gaugeRatioToSpeed, snapGaugeSpeed, speedToGaugeAngle, speedToGaugeRatio } from "./gauge";
 
 type SpeedHandler = (speed: number) => void;
 
@@ -32,6 +32,7 @@ export class PlayerUI {
   private readonly menu: HTMLDivElement;
   private readonly gauge: HTMLDivElement;
   private readonly gaugeReadout: HTMLSpanElement;
+  private readonly velocityRail: HTMLDivElement;
   private readonly velocityMarker: HTMLSpanElement;
   private readonly items = new Map<number, HTMLButtonElement>();
   private isOpen = false;
@@ -39,6 +40,7 @@ export class PlayerUI {
   private abort = new AbortController();
   private menuAbort: AbortController | null = null;
   private dragging = false;
+  private railDragging = false;
   private dragFrame: number | null = null;
   private pendingDragSpeed: number | null = null;
 
@@ -77,13 +79,13 @@ export class PlayerUI {
     this.menu.setAttribute("aria-label", "Beyond2x playback velocity control");
     this.menu.hidden = true;
     this.gauge = this.createGauge();
-    this.menu.append(this.createPanelHeader(), this.gauge, this.createVelocityRail());
+    this.velocityRail = this.createVelocityRail();
+    this.menu.append(this.createPanelHeader(), this.gauge, this.velocityRail);
     this.gaugeReadout = this.menu.querySelector<HTMLSpanElement>(".beyond2x-gauge-readout")!;
     this.velocityMarker = this.menu.querySelector<HTMLSpanElement>(".beyond2x-velocity-marker")!;
-    this.menu.append(this.createPresetGrid(), this.createPrecisionControl(), this.createPointer());
+    this.menu.append(this.createPresetGrid(), this.createPrecisionControl());
     this.root.append(this.button, this.menu);
     parent.append(this.root);
-    this.bindPointerEffects();
     this.update(1);
   }
 
@@ -103,6 +105,8 @@ export class PlayerUI {
     this.button.setAttribute("aria-label", `Playback speed: ${label}. Open Beyond2x instrument panel`);
     this.gauge.setAttribute("aria-valuenow", String(speed));
     this.gauge.setAttribute("aria-valuetext", `Playback speed ${formatGaugeSpeed(speed)}`);
+    this.velocityRail.setAttribute("aria-valuenow", String(speed));
+    this.velocityRail.setAttribute("aria-valuetext", `Playback speed ${formatGaugeSpeed(speed)}`);
     this.items.forEach((item, preset) => {
       const selected = Math.abs(preset - speed) < 0.001;
       item.classList.toggle("is-selected", selected);
@@ -153,21 +157,7 @@ export class PlayerUI {
     gauge.addEventListener("pointermove", this.moveDrag, { signal: this.abort.signal });
     gauge.addEventListener("pointerup", this.endDrag, { signal: this.abort.signal });
     gauge.addEventListener("pointercancel", this.endDrag, { signal: this.abort.signal });
-    gauge.addEventListener("keydown", (event) => {
-      if (event.key === "ArrowRight" || event.key === "ArrowUp") {
-        event.preventDefault();
-        this.onSpeed(increaseSpeed(this.speed));
-      } else if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
-        event.preventDefault();
-        this.onSpeed(decreaseSpeed(this.speed));
-      } else if (event.key === "Home") {
-        event.preventDefault();
-        this.onSpeed(0.1);
-      } else if (event.key === "End") {
-        event.preventDefault();
-        this.onSpeed(16);
-      }
-    }, { signal: this.abort.signal });
+    gauge.addEventListener("keydown", this.handleGaugeKey, { signal: this.abort.signal });
     return gauge;
   }
 
@@ -189,6 +179,11 @@ export class PlayerUI {
   private createVelocityRail(): HTMLDivElement {
     const rail = document.createElement("div");
     rail.className = "beyond2x-velocity-rail";
+    rail.tabIndex = 0;
+    rail.setAttribute("role", "slider");
+    rail.setAttribute("aria-label", "Playback velocity rail. Drag or click the marker to set a speed.");
+    rail.setAttribute("aria-valuemin", "0.1");
+    rail.setAttribute("aria-valuemax", "16");
     const track = document.createElement("span");
     track.className = "beyond2x-velocity-track";
     const marker = document.createElement("span");
@@ -201,6 +196,11 @@ export class PlayerUI {
       labels.append(node);
     });
     rail.append(track, marker, labels);
+    rail.addEventListener("pointerdown", this.startRailDrag, { signal: this.abort.signal });
+    rail.addEventListener("pointermove", this.moveRailDrag, { signal: this.abort.signal });
+    rail.addEventListener("pointerup", this.endRailDrag, { signal: this.abort.signal });
+    rail.addEventListener("pointercancel", this.endRailDrag, { signal: this.abort.signal });
+    rail.addEventListener("keydown", this.handleGaugeKey, { signal: this.abort.signal });
     return rail;
   }
 
@@ -209,7 +209,7 @@ export class PlayerUI {
     section.className = "beyond2x-preset-section";
     const title = document.createElement("span");
     title.className = "beyond2x-section-label";
-    title.textContent = "ACCELERATION NODES";
+    title.textContent = "PRESET STEPS";
     const grid = document.createElement("div");
     grid.className = "beyond2x-preset-grid";
     for (const preset of SPEED_PRESETS) {
@@ -223,8 +223,6 @@ export class PlayerUI {
         this.onSpeed(preset);
         this.close();
       }, { signal: this.abort.signal });
-      item.addEventListener("pointermove", this.magnetize, { signal: this.abort.signal });
-      item.addEventListener("pointerleave", this.resetMagnet, { signal: this.abort.signal });
       this.items.set(preset, item);
       grid.append(item);
     }
@@ -268,23 +266,6 @@ export class PlayerUI {
     return custom;
   }
 
-  private createPointer(): HTMLSpanElement {
-    const pointer = document.createElement("span");
-    pointer.className = "beyond2x-pointer";
-    pointer.setAttribute("aria-hidden", "true");
-    return pointer;
-  }
-
-  private bindPointerEffects(): void {
-    this.menu.addEventListener("pointermove", (event) => {
-      const rect = this.menu.getBoundingClientRect();
-      this.menu.style.setProperty("--b2x-pointer-x", `${event.clientX - rect.left}px`);
-      this.menu.style.setProperty("--b2x-pointer-y", `${event.clientY - rect.top}px`);
-      this.menu.dataset.pointerActive = "true";
-    }, { signal: this.abort.signal });
-    this.menu.addEventListener("pointerleave", () => { delete this.menu.dataset.pointerActive; }, { signal: this.abort.signal });
-  }
-
   private toggle(): void {
     if (this.isOpen) this.close(); else this.open();
   }
@@ -325,10 +306,7 @@ export class PlayerUI {
     this.dragging = false;
     this.gauge.releasePointerCapture(event.pointerId);
     delete this.gauge.dataset.dragging;
-    if (this.pendingDragSpeed !== null) {
-      this.onSpeed(this.pendingDragSpeed);
-      this.pendingDragSpeed = null;
-    }
+    this.flushDirectSpeed();
   };
 
   private setGaugeFromPointer(event: PointerEvent): void {
@@ -336,27 +314,67 @@ export class PlayerUI {
     const x = event.clientX - rect.left - rect.width / 2;
     const y = event.clientY - rect.top - rect.height / 2;
     const angle = Math.atan2(x, -y) * (180 / Math.PI);
-    this.pendingDragSpeed = snapGaugeSpeed(gaugeAngleToSpeed(angle));
+    this.queueDirectSpeed(snapGaugeSpeed(gaugeAngleToSpeed(angle)));
+  }
+
+  private readonly startRailDrag = (event: PointerEvent): void => {
+    this.railDragging = true;
+    this.velocityRail.setPointerCapture(event.pointerId);
+    this.velocityRail.dataset.dragging = "true";
+    this.setRailFromPointer(event);
+  };
+
+  private readonly moveRailDrag = (event: PointerEvent): void => {
+    if (this.railDragging) this.setRailFromPointer(event);
+  };
+
+  private readonly endRailDrag = (event: PointerEvent): void => {
+    if (!this.railDragging) return;
+    this.railDragging = false;
+    this.velocityRail.releasePointerCapture(event.pointerId);
+    delete this.velocityRail.dataset.dragging;
+    this.flushDirectSpeed();
+  };
+
+  private setRailFromPointer(event: PointerEvent): void {
+    const rect = this.velocityRail.getBoundingClientRect();
+    const ratio = (event.clientX - rect.left) / rect.width;
+    this.queueDirectSpeed(snapGaugeSpeed(gaugeRatioToSpeed(ratio)));
+  }
+
+  private queueDirectSpeed(speed: number): void {
+    this.pendingDragSpeed = speed;
     if (this.dragFrame !== null) return;
     this.dragFrame = requestAnimationFrame(() => {
       this.dragFrame = null;
-      if (this.pendingDragSpeed !== null) this.onSpeed(this.pendingDragSpeed);
+      const next = this.pendingDragSpeed;
+      this.pendingDragSpeed = null;
+      if (next !== null) this.onSpeed(next);
     });
   }
 
-  private readonly magnetize = (event: PointerEvent): void => {
-    const item = event.currentTarget as HTMLButtonElement;
-    const rect = item.getBoundingClientRect();
-    const x = Math.max(-2.5, Math.min(2.5, (event.clientX - (rect.left + rect.width / 2)) / 10));
-    const y = Math.max(-2.5, Math.min(2.5, (event.clientY - (rect.top + rect.height / 2)) / 10));
-    item.style.setProperty("--b2x-magnet-x", `${x.toFixed(2)}px`);
-    item.style.setProperty("--b2x-magnet-y", `${y.toFixed(2)}px`);
-  };
+  private flushDirectSpeed(): void {
+    if (this.dragFrame !== null) cancelAnimationFrame(this.dragFrame);
+    this.dragFrame = null;
+    const next = this.pendingDragSpeed;
+    this.pendingDragSpeed = null;
+    if (next !== null) this.onSpeed(next);
+  }
 
-  private readonly resetMagnet = (event: PointerEvent): void => {
-    const item = event.currentTarget as HTMLButtonElement;
-    item.style.removeProperty("--b2x-magnet-x");
-    item.style.removeProperty("--b2x-magnet-y");
+  private readonly handleGaugeKey = (event: KeyboardEvent): void => {
+    if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+      event.preventDefault();
+      this.onSpeed(increaseSpeed(this.speed));
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+      event.preventDefault();
+      this.onSpeed(decreaseSpeed(this.speed));
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      this.onSpeed(0.1);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      this.onSpeed(16);
+    }
   };
 
   private readonly handleOutside = (event: PointerEvent): void => {

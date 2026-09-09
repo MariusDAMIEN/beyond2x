@@ -40,5 +40,9 @@ describe("PlayerUI", () => {
     expect(gauge.getAttribute("aria-valuetext")).toBe("Playback speed 3.00×");
     gauge.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     expect(callback).toHaveBeenCalledWith(3.25);
+    ui.update(3.25);
+    const rail = parent.querySelector<HTMLElement>(".beyond2x-velocity-rail")!;
+    rail.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+    expect(callback).toHaveBeenLastCalledWith(3);
   });
 });
